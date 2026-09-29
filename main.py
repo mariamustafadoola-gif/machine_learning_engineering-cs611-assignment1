@@ -1,10 +1,10 @@
 """
-CS611 Assignment 1: medallion data pipeline for loan default prediction.
+CS611 Assignment 1: Medallion Data Pipeline for Loan Default Prediction.
 
 Run from the project folder:
     python main.py
 
-It builds:
+It builds the following:
     datamart/bronze/<source>/            raw monthly copies (CSV)
     datamart/silver/<source>/            cleaned, typed tables (parquet)
     datamart/gold/label_store/           30dpd_6mob labels (parquet)
