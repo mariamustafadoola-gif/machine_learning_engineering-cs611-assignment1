@@ -28,7 +28,7 @@ from utils.data_processing_silver_table import (
 )
 
 # ---------------------------------------------------------------------------
-# Settings
+# Configured Settings
 # ---------------------------------------------------------------------------
 START_DATE = "2023-01-01"
 END_DATE = "2024-12-01"   # last month with clickstream and loan data for the labelled window
@@ -46,7 +46,8 @@ SILVER_STEPS = {
 
 
 def generate_first_of_month_dates(start_date_str, end_date_str):
-    """All first-of-month dates from start to end, inclusive, as 'YYYY-MM-DD' strings."""
+    """All first-of-month dates from Start to End """
+    """ Inclusive, as 'YYYY-MM-DD' strings."""
     current = datetime.strptime(start_date_str, "%Y-%m-%d").replace(day=1)
     end = datetime.strptime(end_date_str, "%Y-%m-%d")
     dates = []
@@ -70,25 +71,25 @@ def main():
     dates = generate_first_of_month_dates(START_DATE, END_DATE)
     print(f"Processing {len(dates)} monthly snapshots: {dates[0]} to {dates[-1]}")
 
-    # Bronze: every source, every month
+    # BRONZE
     print("\n=== BRONZE ===")
     for d in dates:
         for source_name in SOURCES:
             process_bronze_table(source_name, d, BRONZE_ROOT, spark)
 
-    # Silver: clean each source, every month
+    # SILVER
     print("\n=== SILVER ===")
     for d in dates:
         for source_name, step in SILVER_STEPS.items():
             step(d, BRONZE_ROOT, SILVER_ROOT, spark)
 
-    # Gold: label store and feature store, every month
+    # GOLD
     print("\n=== GOLD ===")
     for d in dates:
         process_label_store(d, SILVER_ROOT, GOLD_ROOT, spark)
         process_feature_store(d, SILVER_ROOT, GOLD_ROOT, spark)
 
-    # Summary
+    # SUMMARY
     labels = spark.read.parquet(os.path.join(GOLD_ROOT, "label_store", "*.parquet"))
     features = spark.read.parquet(os.path.join(GOLD_ROOT, "feature_store", "*.parquet"))
     print("\n=== DONE ===")
